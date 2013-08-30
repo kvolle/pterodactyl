@@ -1,24 +1,9 @@
 function AerodynamicProperties
-% Function File to Designate Aerodynamic Properties for the NACA 0012
-% Airfoil used on the Pterodactyl
 
-% Change Logs 
-%{
-    10/2012 - Function Written by Trevor Bennett
-    5/2013 - Control Surface Average Values Added by Trevor Bennett
-    5/15/2013 - Code Packaged by Trevor Bennett
-%}
+% This function is based on the work of Trevor Bennett at TAMU
+% The data is taken directly from him and cited as him as
 
-
- tic
-%% Air Properties %%
-% Dynamic Viscosity of Air
-temp = 70;              % Temperature in degrees F
-fit = 0.0051*temp + 3.4292;
-mu = fit*1E-7;          % [ lbsf/ft^2]
-
-%% Input Aerodynamic Properties %%
-    % The Pterodactyle Currently Utilizes a NACA 0012 Airfoil
+ % The Pterodactyle Currently Utilizes a NACA 0012 Airfoil
     %{
         ORIGINAL SOURCE: Sheldahl, R. E. and Klimas, P. C., Aerodynamic 
         Characteristics of Seven Airfoil Sections Through 
@@ -31,10 +16,20 @@ mu = fit*1E-7;          % [ lbsf/ft^2]
             http://www.cyberiad.net/library/airfoils/foildata/n0012cl.htm
             http://www.cyberiad.net/library/airfoils/foildata/n0012cd.htm
             http://www.cyberiad.net/library/airfoils/foildata/n0012cm.htm
+ 
+        This data is no longer available from cyberiad's public site
+        Eventually will need a citeable source.
     %}
+ 
+% Reynolds number for each column:
+ReClin = [160000,360000,700000,1000000,2000000,5000000];
 
-%%% Lift Coefficient Data %%%
-AlphaClin = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,...
+% Angle of Attack
+%  0-27 increment by 1 degree
+%  30-330 increment by 5 degrees
+%  333-360 increment by 1 degree
+
+Alpha = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,...
     23,24,25,26,27,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,...
     115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,...
     200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,...
@@ -42,8 +37,7 @@ AlphaClin = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,...
     340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,...
     357,358,359,360]';
 
-ReClin = [160000,360000,700000,1000000,2000000,5000000];
-
+%Coefficient of Lift
 ClAlphain = ...
     [0         0         0         0         0         0
     0.1100    0.1100    0.1100    0.1100    0.1100    0.1100
@@ -163,150 +157,21 @@ ClAlphain = ...
    -0.1100   -0.1100   -0.1100   -0.1100   -0.1100   -0.1100
    0         0         0         0         0         0];
 
+% Pitching Moment About Quarter Chord
+%  Pitching moment table corresponds to different angles
+%  and different Reynolds numbers than the force coefficients
 
-%%% Drag Coefficient Data %%%
-AlphaCdin = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,...
-    23,24,25,26,27,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100,105,110,...
-    115,120,125,130,135,140,145,150,155,160,165,170,175,180,185,190,195,...
-    200,205,210,215,220,225,230,235,240,245,250,255,260,265,270,275,280,...
-    285,290,295,300,305,310,315,320,325,330,333,334,335,336,337,338,339,...
-    340,341,342,343,344,345,346,347,348,349,350,351,352,353,354,355,356,...
-    357,358,359,360]';
-
-ReCdin = [160000,360000,700000,1000000,2000000,5000000];
-
-CdAlphain = ...
-   [0.0103    0.0079    0.0067    0.0065    0.0064    0.0064
-    0.0104    0.0080    0.0068    0.0066    0.0064    0.0064
-    0.0108    0.0084    0.0070    0.0068    0.0066    0.0066
-    0.0114    0.0089    0.0075    0.0071    0.0069    0.0068
-    0.0124    0.0098    0.0083    0.0078    0.0073    0.0072
-    0.0140    0.0113    0.0097    0.0091    0.0081    0.0076
-    0.0152    0.0125    0.0108    0.0101    0.0090    0.0081
-    0.0170    0.0135    0.0118    0.0110    0.0097    0.0086
-    0.0185    0.0153    0.0128    0.0119    0.0105    0.0092
-    0.0203    0.0167    0.0144    0.0134    0.0113    0.0098
-    0.0188    0.0184    0.0159    0.0147    0.0128    0.0106
-    0.0760    0.0204    0.0175    0.0162    0.0140    0.0118
-    0.1340    0.0217    0.0195    0.0180    0.0155    0.0130
-    0.1520    0.0222    0.0216    0.0200    0.0172    0.0143
-    0.1710    0.1060    0.0236    0.0222    0.0191    0.0159
-    0.1900    0.1900    0.1170    0.0245    0.0213    0.0177
-    0.2100    0.2100    0.2100    0.1280    0.0237    0.0198
-    0.2310    0.2310    0.2300    0.2310    0.1380    0.0229
-    0.2520    0.2520    0.2520    0.2520    0.2520    0.1480
-    0.2740    0.2740    0.2740    0.2740    0.2740    0.2740
-    0.2970    0.2970    0.2970    0.2970    0.2970    0.2970
-    0.3200    0.3200    0.3200    0.3200    0.3200    0.3200
-    0.3440    0.3440    0.3440    0.3440    0.3440    0.3440
-    0.3690    0.3690    0.3690    0.3690    0.3690    0.3690
-    0.3940    0.3940    0.3940    0.3940    0.3940    0.3940
-    0.4200    0.4200    0.4200    0.4200    0.4200    0.4200
-    0.4460    0.4460    0.4460    0.4460    0.4460    0.4460
-    0.4730    0.4730    0.4730    0.4730    0.4730    0.4730
-    0.5700    0.5700    0.5700    0.5700    0.5700    0.5700
-    0.7450    0.7450    0.7450    0.7450    0.7450    0.7450
-    0.9200    0.9200    0.9200    0.9200    0.9200    0.9200
-    1.0750    1.0750    1.0750    1.0750    1.0750    1.0750
-    1.2150    1.2150    1.2150    1.2150    1.2150    1.2150
-    1.3450    1.3450    1.3450    1.3450    1.3450    1.3450
-    1.4700    1.4700    1.4700    1.4700    1.4700    1.4700
-    1.5750    1.5750    1.5750    1.5750    1.5750    1.5750
-    1.6650    1.6650    1.6650    1.6650    1.6650    1.6650
-    1.7350    1.7350    1.7350    1.7350    1.7350    1.7350
-    1.7800    1.7800    1.7800    1.7800    1.7800    1.7800
-    1.8000    1.8000    1.8000    1.8000    1.8000    1.8000
-    1.8000    1.8000    1.8000    1.8000    1.8000    1.8000
-    1.7800    1.7800    1.7800    1.7800    1.7800    1.7800
-    1.7500    1.7500    1.7500    1.7500    1.7500    1.7500
-    1.7000    1.7000    1.7000    1.7000    1.7000    1.7000
-    1.6350    1.6350    1.6350    1.6350    1.6350    1.6350
-    1.5550    1.5550    1.5550    1.5550    1.5550    1.5550
-    1.4650    1.4650    1.4650    1.4650    1.4650    1.4650
-    1.3500    1.3500    1.3500    1.3500    1.3500    1.3500
-    1.2250    1.2250    1.2250    1.2250    1.2250    1.2250
-    1.0850    1.0850    1.0850    1.0850    1.0850    1.0850
-    0.9250    0.9250    0.9250    0.9250    0.9250    0.9250
-    0.7550    0.7550    0.7550    0.7550    0.7550    0.7550
-    0.5750    0.5750    0.5750    0.5750    0.5750    0.5750
-    0.4200    0.4200    0.4200    0.4200    0.4200    0.4200
-    0.3200    0.3200    0.3200    0.3200    0.3200    0.3200
-    0.2300    0.2300    0.2300    0.2300    0.2300    0.2300
-    0.1400    0.1400    0.1400    0.1400    0.1400    0.1400
-    0.0550    0.0550    0.0550    0.0550    0.0550    0.0550
-    0.0250    0.0250    0.0250    0.0250    0.0250    0.0250
-    0.0550    0.0550    0.0550    0.0550    0.0550    0.0550
-    0.1400    0.1400    0.1400    0.1400    0.1400    0.1400
-    0.2300    0.2300    0.2300    0.2300    0.2300    0.2300
-    0.3200    0.3200    0.3200    0.3200    0.3200    0.3200
-    0.4200    0.4200    0.4200    0.4200    0.4200    0.4200
-    0.5750    0.5750    0.5750    0.5750    0.5750    0.5750
-    0.7550    0.7550    0.7550    0.7550    0.7550    0.7550
-    0.9250    0.9250    0.9250    0.9250    0.9250    0.9250
-    1.0850    1.0850    1.0850    1.0850    1.0850    1.0850
-    1.2250    1.2250    1.2250    1.2250    1.2250    1.2250
-    1.3500    1.3500    1.3500    1.3500    1.3500    1.3500
-    1.4650    1.4650    1.4650    1.4650    1.4650    1.4650
-    1.5550    1.5550    1.5550    1.5550    1.5550    1.5550
-    1.6350    1.6350    1.6350    1.6350    1.6350    1.6350
-    1.7000    1.7000    1.7000    1.7000    1.7000    1.7000
-    1.7500    1.7500    1.7500    1.7500    1.7500    1.7500
-    1.7800    1.7800    1.7800    1.7800    1.7800    1.7800
-    1.8000    1.8000    1.8000    1.8000    1.8000    1.8000
-    1.8000    1.8000    1.8000    1.8000    1.8000    1.8000
-    1.7800    1.7800    1.7800    1.7800    1.7800    1.7800
-    1.7350    1.7350    1.7350    1.7350    1.7350    1.7350
-    1.6650    1.6650    1.6650    1.6650    1.6650    1.6650
-    1.5750    1.5750    1.5750    1.5750    1.5750    1.5750
-    1.4700    1.4700    1.4700    1.4700    1.4700    1.4700
-    1.3450    1.3450    1.3450    1.3450    1.3450    1.3450
-    1.2150    1.2150    1.2150    1.2150    1.2150    1.2150
-    1.0750    1.0750    1.0750    1.0750    1.0750    1.0750
-    0.9200    0.9200    0.9200    0.9200    0.9200    0.9200
-    0.7450    0.7450    0.7450    0.7450    0.7450    0.7450
-    0.5700    0.5700    0.5700    0.5700    0.5700    0.5700
-    0.4730    0.4730    0.4730    0.4730    0.4730    0.4730
-    0.4460    0.4460    0.4460    0.4460    0.4460    0.4460
-    0.4200    0.4200    0.4200    0.4200    0.4200    0.4200
-    0.3940    0.3940    0.3940    0.3940    0.3940    0.3940
-    0.3690    0.3690    0.3690    0.3690    0.3690    0.3690
-    0.3440    0.3440    0.3440    0.3440    0.3440    0.3440
-    0.3200    0.3200    0.3200    0.3200    0.3200    0.3200
-    0.2970    0.2970    0.2970    0.2970    0.2970    0.2970
-    0.2740    0.2740    0.2740    0.2740    0.2740    0.2740
-    0.2520    0.2520    0.2520    0.2520    0.2520    0.1480
-    0.2310    0.2310    0.2300    0.2310    0.1380    0.0229
-    0.2100    0.2100    0.2100    0.1280    0.0237    0.0198
-    0.1900    0.1900    0.1170    0.0245    0.0213    0.0177
-    0.1710    0.1060    0.0236    0.0222    0.0191    0.0159
-    0.1520    0.0222    0.0216    0.0200    0.0172    0.0143
-    0.1340    0.0217    0.0195    0.0180    0.0155    0.0130
-    0.0760    0.0204    0.0175    0.0162    0.0140    0.0118
-    0.0188    0.0184    0.0159    0.0147    0.0128    0.0106
-    0.0203    0.0167    0.0144    0.0134    0.0113    0.0098
-    0.0185    0.0153    0.0128    0.0119    0.0105    0.0092
-    0.0170    0.0135    0.0118    0.0110    0.0097    0.0086
-    0.0152    0.0125    0.0108    0.0101    0.0090    0.0081
-    0.0140    0.0113    0.0097    0.0091    0.0081    0.0076
-    0.0124    0.0098    0.0083    0.0078    0.0073    0.0072
-    0.0114    0.0089    0.0075    0.0071    0.0069    0.0068
-    0.0108    0.0084    0.0070    0.0068    0.0066    0.0066
-    0.0104    0.0080    0.0068    0.0066    0.0064    0.0064
-    0.0103    0.0079    0.0067    0.0065    0.0064    0.0064];
-
-
-%%% Moment Coefficient Data %%%
 % Moment About the Quater Chord
-AlphaCmin = [0,2,4,6,8,10,11,12,13,14,15,16,17,18,20,22,24,26,28,30,34,38,...
+AlphaCm = [0,2,4,6,8,10,11,12,13,14,15,16,17,18,20,22,24,26,28,30,34,38,...
     40,42.5,45,50,55,60,65,70,75,80,85,86,90,91,95,100,105,110,115,120,...
     125,130,131,135,136,140,145,150,155,160,165,170,175,180,185,190,195,...
     200,205,210,215,220,224,225,229,230,235,240,245,250,255,260,265,269,...
     270,274,275,280,285,290,295,300,305,310,315,317.5,320,322,326,330,332,...
     334,336,338,340,342,343,344,345,346,347,348,349,350,352,354,356,358,360]';
 
-ReCmin = [360000,500000,700000,860000,1360000,1760000];
+ReCm = [360000,500000,700000,860000,1360000,1760000];
 
-CmAlphain = ...
+CmAlpha = ...
    [ 0         0         0         0         0         0
    -0.0100   -0.0050    0.0070    0.0040    0.0060         0
    -0.0220   -0.0100    0.0080    0.0070    0.0100    0.0030
@@ -418,119 +283,3 @@ CmAlphain = ...
    -0.0050   -0.0020   -0.0120   -0.0090   -0.0060   -0.0110
    -0.0170   -0.0070   -0.0030   -0.0050   -0.0020   -0.0060
    0         0         0         0         0         0];
-
-%% Data Rotation to Airfoil Frame %%
-% The rotation of the cl and cd data rotates the lift and drag forces in
-% the wind frame into the airfoil fixed frame.
-
-% Allocate Memory
-% Assuming the drag and lift measurements occured at same alpha increments
-r = length(AlphaClin);            
-c = length(ReClin);               % Corresponding number of data sets in Re
-cfzAlpha = zeros(r,c);
-cfxAlpha = zeros(r,c);   
-for i = 1:r
-    alpha = AlphaClin(i,1);
-    Ca = cosd(alpha);
-    Sa = sind(alpha);
-    for j = 1:c
-       % Negative because lift is in -z direction
-       % Negative because drag is in -x direction
-       cfzAlpha(i,j) = -(Ca*ClAlphain(i,j) + Sa*CdAlphain(i,j));     
-       cfxAlpha(i,j) = -(-Sa*ClAlphain(i,j) + Ca*CdAlphain(i,j));
-    end 
-end
-
-%% Re-Mesh the Data %%
-% Transfer Data
-ReCF = ReClin;
-ReCm = ReCmin;
-
-% Mesh Accuracy
-Mesh = 0.1;
-MeshMult = 1/Mesh;
-
-% AlphaCF
-Alpha = (0:Mesh:360)';
-lalph = length(Alpha);
-
-% Allocate Memory
-CFxAlpha = zeros(lalph,c);
-CFzAlpha = zeros(lalph,c);
-CmAlpha = zeros(lalph,c);
-
-% Populate Matricies
-for i = 1:lalph
-    alph = Alpha(i,1);
-    for j = 1:c
-        CFxAlpha(i,j) = interp2(ReCF,AlphaClin,cfxAlpha,ReCF(1,j),alph,'spline');
-        CFzAlpha(i,j) = interp2(ReCF,AlphaClin,cfzAlpha,ReCF(1,j),alph,'spline');
-        CmAlpha(i,j) = interp2(ReCF,AlphaCmin,CmAlphain,ReCF(1,j),alph,'spline');
-    end   
-end
-
-%% Control Surface Deflection Coefficients %%
-% Assuming Linear fits within -amax <= del_alpha <= amax. This assumption
-% is only reasonable if the primary flow over the control surface is from
-% the propeller wash and that the effective change in angle of attack is 
-% small.
-amax = 5;
-lena = amax/Mesh;
-
-% CFx
-CFxFitData = zeros(2*lena*c+1,2);
-for ind = 1:c
-  top = CFxAlpha(1:lena,ind);
-  ta = Alpha(1:lena,1);
-  bottom = CFxAlpha(end-lena+1:end,ind);
-  tb = Alpha(end-lena+1:end,1) - 360;
-  CFxFitData(2*lena*(ind-1)+1:2*lena*ind,1) = [tb;ta];
-  CFxFitData(2*lena*(ind-1)+1:2*lena*ind,2) = [bottom;top];
-end
-% Parabolic Fit - Best
-CFxFit = polyfit(CFxFitData(:,1),CFxFitData(:,2),2);
-CFxCoeff = CFxFit(end-1);
-% Linear Fit - Best for state space control - not good values
-% CFxLinFit = polyfit(CFxFitData(:,1),CFxFitData(:,2),1);
-% CFxCoeff = CFxLinFit(end-1);
-
-% CFz
-CFzFitData = zeros(2*lena*c+1,2);
-for ind = 1:c
-  top = CFzAlpha(1:lena,ind);
-  ta = Alpha(1:lena,1);
-  bottom = CFzAlpha(end-lena+1:end,ind);
-  tb = Alpha(end-lena+1:end,1) - 360;
-  CFzFitData(2*lena*(ind-1)+1:2*lena*ind,1) = [tb;ta];
-  CFzFitData(2*lena*(ind-1)+1:2*lena*ind,2) = [bottom;top];
-end
-CFzLinFit = polyfit(CFzFitData(:,1),CFzFitData(:,2),1);
-CFzCoeff = CFzLinFit(end-1);
-
-% Cm
-CmFitData = zeros(2*lena*c+1,2);
-for ind = 1:c
-  top = CmAlpha(1:lena,ind);
-  ta = Alpha(1:lena,1);
-  bottom = CmAlpha(end-lena+1:end,ind);
-  tb = Alpha(end-lena+1:end,1) - 360;
-  CmFitData(2*lena*(ind-1)+1:2*lena*ind,1) = [tb;ta];
-  CmFitData(2*lena*(ind-1)+1:2*lena*ind,2) = [bottom;top];
-end
-CmLinFit = polyfit(CmFitData(:,1),CmFitData(:,2),1);
-CmCoeff = CmLinFit(end-1);
-
-%% Save The Data %%
-% Alpha Vector is Scaled!
-Alpha = round(Alpha*MeshMult);
-% Save Data
-save('AerodynamicProperties.mat','mu','Alpha','ReCF','CFxAlpha','CFzAlpha','ReCm','CmAlpha','MeshMult')
-save('ControlLinearizations.mat','CFxCoeff','CFzCoeff','CmCoeff')
-
-%% Plotter %%
-figure(1)
-plot(Alpha,CFxAlpha)
-
-toc
-end
-

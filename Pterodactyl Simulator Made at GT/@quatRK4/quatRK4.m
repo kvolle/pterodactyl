@@ -8,7 +8,7 @@ classdef quatRK4
             obj.Moment = Moment;
         end
         function dState = stateDiff(obj, y)
-            
+            % THIS DOES NOT INCLUDE GRAVITY
             Po = y(1:3);
             Qu = y(4:7);
             Ve = y(8:10);
@@ -36,7 +36,7 @@ classdef quatRK4
         end
         function newState = homebrewRK4(obj)
             dt = 0.002;
-            k1 = obj.stateDiff(obj.State)
+            k1 = obj.stateDiff(obj.State);
             k2 = obj.stateDiff(obj.State+(dt/2)*k1);
             k3 = obj.stateDiff(obj.State+(dt/2)*k2);
             k4 = obj.stateDiff(obj.State+dt*k3);
