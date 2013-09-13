@@ -85,7 +85,7 @@ global plotNum
 plotNum = 1;
 % Initialization Functions
 PterodactylGeometry;
-BEMTfit = BEMT_ControlCoeffs;
+%BEMTfit = BEMT_ControlCoeffs;
 
 %% Initial Conditions %%
 % Aircraft State Vector [x; y; z; Beta0; Beta1; Beta2; Beta3; u; v; w; p; q; r]

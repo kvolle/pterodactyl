@@ -400,6 +400,7 @@ load('ControlLinearizations.mat');
 
 %% Configuration Plotter %%
 global plotNum
+
 Wing = [0,0;0,b/2;-ctip,b/2;-croot,0;-ctip,-b/2;0,-b/2;0,0];
 LAil = [-(croot + csweep*abs(lAil_out)),lAil_out;-lAil_hinge,lAil_out;-lAil_hinge,lAil_in;-(croot + csweep*abs(lAil_in)),lAil_in];
 RAil = [-(croot + csweep*abs(rAil_out)),rAil_out;-rAil_hinge,rAil_out;-rAil_hinge,rAil_in;-(croot + csweep*abs(rAil_in)),rAil_in];

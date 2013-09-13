@@ -8,11 +8,15 @@ classdef quatRK4
             obj.Moment = Moment;
         end
         function dState = stateDiff(obj, y)
-            % THIS DOES NOT INCLUDE GRAVITY
+            
             Po = y(1:3);
             Qu = y(4:7);
             Ve = y(8:10);
             An = y(11:13);
+            
+            % Convert force due to gravity into the body frame
+            t = 2*cross(Qu(2:4),[0;0;obj.m*32.2]);
+            gravity = [0;0;obj.m*32.2]+Qu(1)*t+cross(Qu(2:4),t);
             
             % Define the three matrices used in calculating the diff eqs
             TransKinDiffEq = [1-2*(Qu(3)^2+Qu(4)^2) 2*(Qu(2)*Qu(3)-Qu(1)*Qu(4)) 2*(Qu(2)*Qu(4)+Qu(1)*Qu(3));
@@ -25,7 +29,7 @@ classdef quatRK4
             % Calculate Differential Equations
             dPo = TransKinDiffEq*Ve;
             dQu = RotKinDiffEq*An;
-            dVe = (1/obj.m)*obj.Force - DyDiffEq*Ve;
+            dVe = (1/obj.m)*(obj.Force+gravity) - DyDiffEq*Ve;
             tmp = obj.Moment - DyDiffEq*obj.Ib*An;
             dAn = obj.Ib\tmp;
 

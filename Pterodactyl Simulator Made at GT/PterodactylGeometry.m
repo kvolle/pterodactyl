@@ -1,62 +1,103 @@
-function PterodactylGeometry
+function [htm, area,thrustHTM] = PterodactylGeometry
 
 span = 10;
 croot = 3;
 ctip  = 2;
 
-% Plot the outer edge of the planform based on the above definitions
-leadingEdgeY = linspace(-span/2,span/2,1000);
-tipsX = linspace(0,-ctip,400);
-trailingY = linspace(-span/2,0,500);
-trailingX = linspace(-ctip,-croot,500);
-
-axis([-(span/2+1) (span/2+1) -(croot+1) 1]);
-hold on
-axis equal
-
-% Axis labels to match AE convention
-xlabel('Y axis')
-ylabel('X axis');
-title('Pterodactyl Planform Geometry');
-
-% plot leading edge
-plot(leadingEdgeY,0,'k.-','LineWidth',100);
-% plot left tip
-plot(-span/2,tipsX,'k.-','LineWidth',100);
-% plot right tip
-plot(span/2,tipsX,'k.-','LineWidth',100);
-% plot left trailing edge;
-plot(trailingY,trailingX,'k.-');
-%plot right trailing edge
-plot(trailingY+span/2,fliplr(trailingX),'k.-');
-
-% Plot the quarter chord line for fully extended wings
-%  This will need to be amended later
-qcX = linspace(-ctip/4,-croot/4,15);
-qcY = linspace(-span/2,0,15);
-% plot left quarter chord line
-plot(qcY,qcX,'b*-');
-% plot right quarter chord line
-plot(qcY+span/2,fliplr(qcX),'b*-');
+% Center of mass
+comX = -1.2667;
+comY = 0;
+comZ = 0;
 
 % Hinge Geometry
 hingeY = 1.75;  % Distance from center to hinge/LE intersection
-hingeD = 15;    % Angle from chord at -hingeY to hinge line on left side
-hingeR = hingeD*pi/180;
+hingeR = 15*pi/180;
+phi    = 0;     % Angle of the hinge, tips down for positive angle
+
+%Propeller Position
+hingeToProp = 0.5;
 
 % Body Y position of hinge intersection with trailing edge
-%intY = (ctip - croot + hingeY*tan(hingeR))/(-tan(hingeR)+(2*(croot-ctip)/span));
-intY = (hingeY/tan(hingeR)+2+croot-ctip)/(2*(ctip-croot)/span - 1/tan(hingeR));
-intX = -2+(intY+span/2)*2*(ctip-croot)/span;
-leftHingeY = linspace(-hingeY,intY,100);
-leftHingeX = linspace(0,intX,100);
-rightHingeY = linspace(hingeY,-intY,100);
-rightHingeX = linspace(0,intX,100);
-plot(leftHingeY,leftHingeX,'k-.');
-plot(rightHingeY,rightHingeX,'k-.');
-%plot outer edges of triangular sections
-plot(intY,linspace(0,intX),'r--');
-plot(-intY,linspace(0,intX),'r--');
-%plot inner edges of triangular sections
-plot(-hingeY,linspace(0,(2*(ctip-croot)/span)*(span/2 - hingeY) -2),'r--');
-plot(hingeY,linspace(0,(2*(ctip-croot)/span)*(span/2 - hingeY) -2),'r--');
+intY = (croot - hingeY/tan(-hingeR))/(2*(croot-ctip)/span - 1/tan(-hingeR));
+intX = (intY-hingeY)/tan(-hingeR);
+
+% Section definiton
+% 1-22 is right half, 23-24 is left half
+centSectionWidth = hingeY/10;
+tmp = centSectionWidth/2;
+
+%Memory allocation
+htm = zeros(4,4,44);
+area =zeros(1,44);
+
+%Center section
+for i = 1:10
+    htm(1:4,1:4,i) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+                     [1 0 0 ((i-0.5)*centSectionWidth)*(croot-ctip)/(2*span)-croot/4;...
+                      0 1 0 (i-0.5)*centSectionWidth;...
+                      0 0 1 0; 0 0 0 1];
+    area(i) = -centSectionWidth*((i-0.5)*centSectionWidth*2*(croot-ctip)/span -croot);
+end
+for i = 1:10
+    htm(1:4,1:4,22+i) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+                        [1 0 0 ((i-0.5)*centSectionWidth)*(croot-ctip)/(2*span)-croot/4;...
+                         0 1 0 -(i-0.5)*centSectionWidth;...
+                         0 0 1 0; 0 0 0 1];
+    area(22+i) = -centSectionWidth*((i-0.5)*centSectionWidth*2*(croot-ctip)/span -croot);
+end
+% End Sections
+tipSectionWidth = (span/2-intY)/10;
+
+for i=1:10
+    htm(1:4,1:4,12+i)= [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 1 0 intY-hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 (intY+(i-0.5)*tipSectionWidth)*(croot-ctip)/(2*span)-croot/4;0 1 0 (i-0.5)*tipSectionWidth;0 0 01 0;0 0 0 1];
+    area(12+i) = -tipSectionWidth*((intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span -croot);
+end
+for i=1:10
+    htm(1:4,1:4,34+i)= [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 -hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 1 0 -intY+hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 (intY+(i-0.5)*tipSectionWidth)*(croot-ctip)/(2*span)-croot/4;0 1 0 -(i-0.5)*tipSectionWidth;0 0 01 0;0 0 0 1];
+    area(34+i) = -tipSectionWidth*((intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span -croot);
+end
+%MACs of outer triangles
+htm(1:4,1:4,12) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 intX/3;0 1 0 2*(intY-hingeY)/3;0 0 1 0; 0 0 0 1];
+htm(1:4,1:4,34) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 -hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 intX/3;0 1 0 -2*(intY-hingeY)/3;0 0 1 0; 0 0 0 1];
+area(12) = -0.5*(intY-hingeY)*intX;
+area(34) = -0.5*(intY-hingeY)*intX;
+% MACs of inner triangles
+% X Coord is arbitrary, get advice from Dr Rogers
+htm(1:4,1:4,11) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+                  [1 0 0 (intX+2*(croot-ctip)*(hingeY+(intY-hingeY)/3)/span - croot)/3;0 1 0 hingeY+(intY-hingeY)/3;0 0 1 0; 0 0 0 1];
+htm(1:4,1:4,33) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+                  [1 0 0 (intX+2*(croot-ctip)*(hingeY+(intY-hingeY)/3)/span - croot)/3;0 1 0 -hingeY-(intY-hingeY)/3;0 0 1 0; 0 0 0 1];
+area(11) = -0.5*(intY-hingeY)*(2*(croot-ctip)*hingeY/span-croot);
+area(33) = -0.5*(intY-hingeY)*(2*(croot-ctip)*hingeY/span-croot);
+
+% HTMs of thrust
+ThrustHTM = zeros(4,4,3);
+ThrustHTM(:,:,1) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 -hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0; 0 1 0 -hingeToProp; 0 0 1 0; 0 0 0 1];
+ThrustHTM(:,:2) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0  0 0 1];
+ThrustHTM(:,:,3) = [1 0 0 -comX;0 1 0 -comY; 0 0 1 -comZ;0 0 0 1]*...
+          [cos(-hingeR) -sin(-hingeR) 0 0;sin(-hingeR) cos(-hingeR) 0 hingeY;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 cos(phi) -sin(phi) 0;0 sin(phi) cos(phi) 0;0 0 0 1]*...
+          [cos(hingeR) -sin(hingeR) 0 0;sin(hingeR) cos(hingeR) 0 0;0 0 1 0;0 0 0 1]*...
+          [1 0 0 0;0 1 0 hingeToProp;0 0 1 0; 0 0 0 1];
