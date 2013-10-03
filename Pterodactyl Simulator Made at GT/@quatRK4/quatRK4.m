@@ -15,8 +15,8 @@ classdef quatRK4
             An = y(11:13);
             
             % Convert force due to gravity into the body frame
-            t = 2*cross(Qu(2:4),[0;0;obj.m*32.2]);
-            gravity = [0;0;obj.m*32.2]+Qu(1)*t+cross(Qu(2:4),t);
+            t = 2*cross(Qu(2:4),[0;0;-obj.m]);
+            gravity = [0;0;-obj.m]+Qu(1)*t+cross(Qu(2:4),t);
             
             % Define the three matrices used in calculating the diff eqs
             TransKinDiffEq = [1-2*(Qu(3)^2+Qu(4)^2) 2*(Qu(2)*Qu(3)-Qu(1)*Qu(4)) 2*(Qu(2)*Qu(4)+Qu(1)*Qu(3));
@@ -39,7 +39,7 @@ classdef quatRK4
             dState(11:13,1) = dAn;
         end
         function newState = homebrewRK4(obj)
-            dt = 0.002;
+            dt = 0.001;
             k1 = obj.stateDiff(obj.State);
             k2 = obj.stateDiff(obj.State+(dt/2)*k1);
             k3 = obj.stateDiff(obj.State+(dt/2)*k2);

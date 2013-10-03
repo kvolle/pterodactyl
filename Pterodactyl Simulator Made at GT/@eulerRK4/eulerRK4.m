@@ -8,11 +8,15 @@ classdef eulerRK4
             obj.Moment = Moment;
         end
         function dState = stateDiff(obj, y)
-            % THIS DOES NOT INCLUDE GRAVITY
+            
             Po = y(1:3);
             Or = y(4:6);
             Ve = y(7:9);
             An = y(10:12);
+            
+            gravity = [cos(Or(1))*cos(Or(2)) cos(Or(1))*sin(Or(2))*sin(Or(3))-sin(Or(1))*cos(Or(3)) cos(Or(1))*sin(Or(2))*cos(Or(3))+sin(Or(1))*sin(Or(3));...
+                       sin(Or(1))*cos(Or(2)) sin(Or(1))*sin(Or(2))*sin(Or(3))+cos(Or(1))*cos(Or(3)) sin(Or(1))*sin(Or(2))*cos(Or(3))-cos(Or(1))*sin(Or(3));...
+                       -sin(Or(2)) cos(Or(2))*sin(Or(3)) cos(Or(2))*cos(Or(3))]*[0;0;obj.m];
             
             % Define the three matrices used in calculating the diff eqs
             TransKinDiffEq = [cos(Or(2))*cos(Or(3)), sin(Or(1))*sin(Or(2))*cos(Or(3))-cos(Or(1))*sin(Or(3)), cos(Or(1))*sin(Or(2))*cos(Or(3))-sin(Or(1))*sin(Or(3));
@@ -26,7 +30,7 @@ classdef eulerRK4
             % Calculate Differential Equations
             dPo = TransKinDiffEq*Ve;
             dOr = RotKinDiffEq*An;
-            dVe = (1/obj.m)*obj.Force - DyDiffEq*Ve;
+            dVe = (1/obj.m)*(obj.Force+gravity) - DyDiffEq*Ve;
             tmp = obj.Moment - DyDiffEq*obj.Ib*An;
             dAn = obj.Ib\tmp;
 
@@ -37,7 +41,7 @@ classdef eulerRK4
         end
         function newState = homebrewRK4(obj)
             dt = 0.002;
-            k1 = obj.stateDiff(obj.State)
+            k1 = obj.stateDiff(obj.State);
             k2 = obj.stateDiff(obj.State+(dt/2)*k1);
             k3 = obj.stateDiff(obj.State+(dt/2)*k2);
             k4 = obj.stateDiff(obj.State+dt*k3);

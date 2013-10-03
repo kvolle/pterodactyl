@@ -42,12 +42,12 @@ plot(comY,comX,'ro');
 % Hinge Geometry
 hingeY = 1.75;  % Distance from center to hinge/LE intersection
 hingeD = 15;    % Angle from chord at -hingeY to hinge line on left side
-hingeR = hingeD*pi/180;
+psi = hingeD*pi/180;
 phi    = 0;     % Angle of the hinge, tips down for positive angle
 
 % Body Y position of hinge intersection with trailing edge
-intY = (croot - hingeY/tan(-hingeR))/(2*(croot-ctip)/span - 1/tan(-hingeR));
-intX = (intY-hingeY)/tan(-hingeR);
+intY = (croot - hingeY/tan(-psi))/(2*(croot-ctip)/span - 1/tan(-psi));
+intX = (intY-hingeY)/tan(-psi);
 
 HingeX = linspace(0,intX,100);
 rightHingeY = linspace(hingeY,intY,100);
@@ -63,7 +63,7 @@ plot(-intY,linspace(0,intX),'r--');
 plot(-hingeY,linspace(0,(2*(ctip-croot)/span)*(span/2 - hingeY) -ctip),'r--');
 plot(hingeY,linspace(0,(2*(ctip-croot)/span)*(span/2 - hingeY) -ctip),'r--');
 
-[htm,~] = PterodactylGeometry;
+[htm,~,~] = PterodactylGeometry;
 for i = 1:44
     plot(htm(2,4,i)+comY,htm(1,4,i)+comX,'g*');
 end

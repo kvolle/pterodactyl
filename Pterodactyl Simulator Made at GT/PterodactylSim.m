@@ -21,15 +21,15 @@ tic
 for i = 1:2500
     clc
     i
-[htm,velocity,alpha,lift,drag,pitchMoment,area]= AerodynamicCoefficients(ball.State);
+[htm,thrustHTM,velocity,alpha,lift,drag,pitchMoment,area]= AerodynamicCoefficients(ball.State);
 
 
 [aeroForces, aeroMoments] = resolveForces(htm,lift,drag,pitchMoment);
+[thrustForce, thrustMoment] = resolveThrust([50/3;50/3;50/3],thrustHTM);
+ball.Force = threshold(aeroForces)+threshold(thrustForce);
 
-ball.Force = threshold(aeroForces)+[0;0;0];
-ball.Moment = threshold(aeroMoments); %[0;0;0];%
+ball.Moment = threshold(aeroMoments)+threshold(thrustMoment); %[0;0;0];%
 tmp(i) = ball.State(8);
-
 test(i) = ball.State(1);
 test2(i) =  ball.State(3);
 ball.State = ball.homebrewRK4();
@@ -43,6 +43,6 @@ mom(i) = aeroMoments(2);
 
 end
 toc/i
-plot(test,-test2,'gh');
+plot(test,-test2,'r');
 hold off
 %plot(al,'rh');

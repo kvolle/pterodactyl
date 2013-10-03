@@ -1,5 +1,5 @@
-function[htm,velocity,alpha,lift,drag,pitchMoment,area]= AerodynamicCoefficients(state)
-[htm,area] = PterodactylGeometry;
+function[htm,thrustHTM,velocity,alpha,lift,drag,pitchMoment,area]= AerodynamicCoefficients(state)
+[htm,area,thrustHTM] = PterodactylGeometry;
 [~, Alpha, ClAlphain, CdAlphain, AlphaCm, ReCm,CmAlpha] = AerodynamicProperties;
 
 % Sea level, 15 deg C
