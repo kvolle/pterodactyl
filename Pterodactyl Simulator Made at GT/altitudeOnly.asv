@@ -49,76 +49,40 @@ A = [(-position1(3)*b1+position1(2)*c1) 0 (-position3(3)*b2+position3(2)*c2);...
      (position1(1)*b1-a1*position1(2)) -position2(2) (-a2*position3(2)+position3(1)*b2)];
 
  % Simulator setup
-State = [0;0;-100;0.2;0.02;-.5;0;0;0;0;0;0];
-%State = [0;0;-100;-0.2;0.2;0.01;0;0;0;0;0;0];
+State = [0;0;-100;0;0;0;0;0;0;0;0;0];
 
-Ib = [45239.31  -43.96  -91.58;...
-      -43.96    991.74  0.90;...
-      -91.58    0.90    54968.33];
 m = 46.18;
 Force = [0;0;0];
 Moment = [0;0;0];
-
-size= 5000;
-testF = zeros(3,size);
-testR = zeros(1,size);
-testP = zeros(1,size);
-testY = zeros(1,size);
+Ib = [Ix 0 0;0 Iy 0;0 0 Iz];
 
 copter = eulerRK4(State,Ib,m,Force,Moment);
 
-cmdAngle = [0;0;0];
-kPhi = 15;
-kTheta = 150;
-kPsi = 15;
-gainOuter = [-kPhi 0 0;0 -kTheta 0;0 0 -kPsi];
+size= 5000;
+testF = zeros(1,size);
+testH = zeros(1,size);
+testV = zeros(1,size);
+
+thrust = zeros(4,1);
+
+kPos = 10;
+kVel = 10;
 
 %Ix = Ib(1,1);
 %Iy = Ib(2,2);
 %Iz = Ib(3,3);
  for i =1:size
-     testR(i) = copter.State(4);
-     testP(i) = copter.State(5);
-     testY(i) = copter.State(6);
-     
-     errAngle = gainOuter*(copter.State(4:6)-cmdAngle);
-     R = [1 sin(copter.State(4))*tan(copter.State(5)) cos(copter.State(4))*tan(copter.State(5));...
-          0 cos(copter.State(4)) -sin(copter.State(4));...
-          0 sin(copter.State(4))/cos(copter.State(5)) cos(copter.State(4))/cos(copter.State(5))];
-      
-     cmdRate = R\errAngle;
-     errRate = copter.State(10:12)-cmdRate;
-     cmdAcc = [0;0;0];
-      
-     %alpha = -1/(Ib(1,1)*Ib(3,3)-Ib(1,3)^2);
-     
-     k1 = 150000;
-     k2 = 1500;
-     k3 = 35000;
-     %{
-     %%Mx = alpha*alpha*(Ib(1,1)*(-k1*errRate(1)+alpha*Ib(1,3)*copter.State(12)-Ib(3,3)*alpha*copter.State(10)+cmdAcc(1))+Ib(1,3)*(-k3*errRate(3)+Ib(1,3)*alpha*copter.State(10)-Ib(1,1)*alpha*copter.State(12)+cmdAcc(3)));
-     My = copter.State(11)-k2*errRate(2)+cmdAcc(2);
-     %%Mz = alpha*alpha*(Ib(1,3)*(-k1*errRate(1)+alpha*Ib(1,3)*copter.State(12)-Ib(3,3)*alpha*copter.State(10)+cmdAcc(1))+Ib(3,3)*(-k3*errRate(3)+Ib(1,3)*alpha*copter.State(10)-Ib(1,1)*alpha*copter.State(12)+cmdAcc(3)));
-     Mx = copter.State(10)-k1*errRate(1)+cmdAcc(1);
-     Mz = copter.State(12)-k3*errRate(3)+cmdAcc(3);
-     %}
-     omega = copter.State(10:12);
-     Mx = (-k1*errRate(1)+omega(1))/(Ix*Iz^2);
-     My = omega(2)-k2*errRate(2);
-     Mz =(-k3*errRate(3)+omega(3))/(Iz*Ix^2);
-     
-     Mx = -k1*errRate(1);
-     My = -k2*errRate(2);
-     Mz = -k3*errRate(3);
-     
-    % Mx = -k1*(errRate(1)-copter.State(10));
-    % My = -k2*(errRate(2)-copter.State(11));
-    % Mz = -k3*(errRate(3)-copter.State(12));
-     %omega = copter.State(10:12);
-     
-     thrust = A\[Mx;My;Mz];
+     testF = sum(thrust);
+     testH = -copter.State(3);
+     testV = -copter.State(9);
 
-     copter.Moment = A*thrust;
+     %x1 is height
+     %x2 is velocity in world Z
+     
+     %This is with forces in world coord
+     [x1dot;x2dot] = [0 1;0 0]*[copter.State(3);copter.State(9)]+[0 0 0 0 0;1 1 1 1]*thrust;
+
+     copter.Moment = A*[thrust(1);thrust(2)+thrust(3); thrust(4)];
      copter.Force= thrust(1)*[a1;b1;c1] + [0; 0; -thrust(2)] + thrust(3)*[a2;b2;c2]; %MIDDLE TERM CORRECT?
      testF(:,i) = copter.Force;
      

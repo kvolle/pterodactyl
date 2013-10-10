@@ -1,4 +1,4 @@
-function [comX, comY, comZ] = massCenter(phiL,phiR);
+function [comX, comY, comZ,Ixx,Iyy,Izz] = massCenter(phiL,phiR);
 %planform geometry
 span = 10;
 croot = 3;
@@ -14,19 +14,23 @@ centSectionWidth = hingeY/10;
 tipSectionWidth = (span/2-intY)/10;
 
 htm=zeros(4,4,44);
-%volume = zeros(1,44);
+Ix=zeros(1,44);
+Iy=zeros(1,44);
+Iz=zeros(1,44);
+volume = zeros(1,44);
+
 %Center section
 for i = 1:10
     htm(1:4,1:4,i) = [1 0 0 -0.4*croot+0.4*((i-0.5)*centSectionWidth)*2*(croot-ctip)/span;...
                       0 1 0 (i-0.5)*centSectionWidth;...
                       0 0 1 0; 0 0 0 1];
-    volume(i) = 0.08217*centSectionWidth*(croot-((i-0.5)*centSectionWidth)*2*(croot-ctip)/span);
+    volume(i) = 0.082206*centSectionWidth*(croot-((i-0.5)*centSectionWidth)*2*(croot-ctip)/span)^2;
 end
 for i = 1:10
     htm(1:4,1:4,22+i) = [1 0 0 -0.4*croot+0.4*((i-0.5)*centSectionWidth)*2*(croot-ctip)/span;...
                          0 1 0 -(i-0.5)*centSectionWidth;...
                          0 0 1 0; 0 0 0 1];
-    volume(22+i) = 0.08217*centSectionWidth*(croot-((i-0.5)*centSectionWidth)*2*(croot-ctip)/span);
+    volume(22+i) = 0.082206*centSectionWidth*(croot-((i-0.5)*centSectionWidth)*2*(croot-ctip)/span)^2;
 end
     % End Sections
 
@@ -36,7 +40,7 @@ for i=1:10
           [cos(psi) -sin(psi) 0 0;sin(psi) cos(psi) 0 0;0 0 1 0;0 0 0 1]*...
           [1 0 0 0;0 1 0 intY-hingeY;0 0 1 0;0 0 0 1]*...
           [1 0 0 0.4*(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span-0.4*croot;0 1 0 (i-0.5)*tipSectionWidth;0 0 01 0;0 0 0 1];
-    volume(12+i) = 0.08217*tipSectionWidth*(croot-(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span);
+    volume(12+i) = 0.082206*tipSectionWidth*(croot-(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span)^2;
 end
 for i=1:10
     htm(1:4,1:4,34+i)= [cos(psi) -sin(psi) 0 0;sin(psi) cos(psi) 0 -hingeY;0 0 1 0;0 0 0 1]*...
@@ -44,10 +48,21 @@ for i=1:10
           [cos(-psi) -sin(-psi) 0 0;sin(-psi) cos(-psi) 0 0;0 0 1 0;0 0 0 1]*...
           [1 0 0 0;0 1 0 -intY+hingeY;0 0 1 0;0 0 0 1]*...
           [1 0 0 0.4*(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span-0.4*croot;0 1 0 -(i-0.5)*tipSectionWidth;0 0 01 0;0 0 0 1];
-    volume(34+i) = 0.08217*tipSectionWidth*(croot-(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span);
+    volume(34+i) = 0.082206*tipSectionWidth*(croot-(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span)^2;
+    
 end
+for i = 1:44
+    Ix(i) = volume(i)*12.214*(htm(2,4,i)^2+htm(3,4,i)^2);
+    Iy(i) = volume(i)*12.214*(htm(1,4,i)^2+htm(3,4,i)^2);
+    Iz(i) = volume(i)*12.214*(htm(1,4,i)^2+htm(2,4,i)^2);
+end
+Ixx = sum(Ix);
+Iyy = sum(Iy);
+Izz = sum(Iz);
 
-
+disp(Ixx)
+disp(Iyy)
+disp(Izz)
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Don't have the triangles around the hinges accounted for
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
