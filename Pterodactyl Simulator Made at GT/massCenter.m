@@ -1,6 +1,6 @@
-function [comX, comY, comZ,Ixx,Iyy,Izz] = massCenter(phiL,phiR);
+function [comX, comY, comZ,Ixx,Iyy,Izz] = massCenter(m,phiL,phiR);
 %planform geometry
-span = 10;
+span = 6;
 croot = 3;
 ctip  = 2;
 
@@ -51,18 +51,19 @@ for i=1:10
     volume(34+i) = 0.082206*tipSectionWidth*(croot-(intY+(i-0.5)*tipSectionWidth)*2*(croot-ctip)/span)^2;
     
 end
+
 for i = 1:44
-    Ix(i) = volume(i)*12.214*(htm(2,4,i)^2+htm(3,4,i)^2);
-    Iy(i) = volume(i)*12.214*(htm(1,4,i)^2+htm(3,4,i)^2);
-    Iz(i) = volume(i)*12.214*(htm(1,4,i)^2+htm(2,4,i)^2);
+    Ix(i) = volume(i)*(m/sum(volume)*(htm(2,4,i)^2+htm(3,4,i)^2)+0.18^2 + 0.30^2);
+    Iy(i) = volume(i)*(m/sum(volume)*(htm(1,4,i)^2+htm(3,4,i)^2)+2.50^2 + 0.30^2);
+    Iz(i) = volume(i)*(m/sum(volume)*(htm(1,4,i)^2+htm(2,4,i)^2)+0.18^2 + 2.50^2);
 end
 Ixx = sum(Ix);
 Iyy = sum(Iy);
 Izz = sum(Iz);
 
-disp(Ixx)
-disp(Iyy)
-disp(Izz)
+%disp(Ixx)
+%disp(Iyy)
+%disp(Izz)
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 % Don't have the triangles around the hinges accounted for
 % ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,6 +71,7 @@ comX = 0;
 comY = 0;
 comZ = 0;
 sumVol = sum(volume);
+
 for i=1:44
     comX = comX + htm(1,4,i)*volume(i)/sumVol;
     comY = comY + htm(2,4,i)*volume(i)/sumVol;

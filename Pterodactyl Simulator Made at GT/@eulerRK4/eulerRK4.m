@@ -16,7 +16,7 @@ classdef eulerRK4
             
             gravity = [cos(Or(1))*cos(Or(2)) cos(Or(1))*sin(Or(2))*sin(Or(3))-sin(Or(1))*cos(Or(3)) cos(Or(1))*sin(Or(2))*cos(Or(3))+sin(Or(1))*sin(Or(3));...
                        sin(Or(1))*cos(Or(2)) sin(Or(1))*sin(Or(2))*sin(Or(3))+cos(Or(1))*cos(Or(3)) sin(Or(1))*sin(Or(2))*cos(Or(3))-cos(Or(1))*sin(Or(3));...
-                       -sin(Or(2)) cos(Or(2))*sin(Or(3)) cos(Or(2))*cos(Or(3))]*[0;0;obj.m];
+                       -sin(Or(2)) cos(Or(2))*sin(Or(3)) cos(Or(2))*cos(Or(3))]*[0;0;obj.m*32.2];
             
             % Define the three matrices used in calculating the diff eqs
             TransKinDiffEq = [cos(Or(2))*cos(Or(3)), sin(Or(1))*sin(Or(2))*cos(Or(3))-cos(Or(1))*sin(Or(3)), cos(Or(1))*sin(Or(2))*cos(Or(3))-sin(Or(1))*sin(Or(3));
@@ -40,7 +40,7 @@ classdef eulerRK4
             dState(10:12,1) = dAn;
         end
         function newState = homebrewRK4(obj)
-            dt = 0.002;
+            dt = 0.001;
             k1 = obj.stateDiff(obj.State);
             k2 = obj.stateDiff(obj.State+(dt/2)*k1);
             k3 = obj.stateDiff(obj.State+(dt/2)*k2);
