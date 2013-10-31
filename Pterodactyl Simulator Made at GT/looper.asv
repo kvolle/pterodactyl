@@ -6,9 +6,9 @@ err = zeros(10,1);
 
 meanErr = zeros(10,10,6);
 stableTable = zeros(10,10,6);
-maxTable = zeros(10,10,6);
+maxTable = zeros(10,10,6)
 for i = 1:10
-    for j = i+1:10
+    for j = 1:10
         for k = 1:6;
             for x = 1:10
                 %[count4(i),err4(i)] = test(2.5,3,7.5);

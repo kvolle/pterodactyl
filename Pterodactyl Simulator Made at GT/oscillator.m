@@ -20,7 +20,7 @@ x = [ball.State(1);ball.State(7)];
 
 t(i) = i/1000;
 %f = (A-[0 0;1050 1050])*x;
-f = [0 1;-5 -6]*x +[0;5*t(i)^.333];
+f = [0 1;-5 -6]*x +[0;15];
 test(i) = x(1);
 %g = A*[ball.State(6);ball.State(12)];
 %a(i) = f(2);
@@ -28,5 +28,4 @@ ball.Force = [f(2);0;0];
 ball.State = ball.homebrewRK4();
 end
 plot(t,test);
-plot(t,0.693415200080653,'r');
-plot(t,-0.693415200080653,'g');
+

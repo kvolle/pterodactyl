@@ -20,11 +20,11 @@ m = 15;
 Ix %= abs(Ix)
 Iy %= abs(Iy)
 Iz %= abs(Iz)
-%{
+
 Ix = 63;
 Iy =6.3;
 Iz = 63;
-%}
+
 hingeY = 1.5;
 hinge2Prop = 0.75;
 
@@ -73,11 +73,9 @@ A = [(-position1(3)*b1+position1(2)*c1) 0 (-position3(3)*b2+position3(2)*c2);...
  a = random('unif',0,200)/100 -1;
  b = random('unif',0,200)/100 -1;
  c = random('unif',0,200)/100 -1;
- d = random('unif',0,200)/100 -1;
- e = random('unif',0,200)/100 -1;
- f = random('unif',0,200)/100 -1;
+ 
 
-State = [0;0;-100;a/2;b/20;c/2;0;0;0;-a;-b;-c];
+State = [0;0;-100;a/2;b/20;c/2;0;0;0;0;0;0];
 %State = [0;0;-100;0;0;0.0;0;0;0;0;0;0];
 
 Ib = [Ix 0 0;0 Iy 0;0 0 Iz];
@@ -101,7 +99,7 @@ shit = zeros(1,size);
 copter = eulerRK4(State,Ib,m,Force,Moment);
 %a = [0 1 0 0 0 0;-.60 -.40 0 0 0 0;0 0 0 1 0 0;0 0 -.60 -.40 0 0; 0 0 0 0 0 1;0 0 0 0 -.60 -.40]
 
-a = [0 1 0 0 0 0;-3.24 -2*3.60 0 0 0 0;0 0 0 1 0 0;0 0 -3.24 -2*3.6 0 0; 0 0 0 0 0 1;0 0 0 0 -3.24 -2*3.60];
+a = [0 1 0 0 0 0;-3.24/Ix -3.60/Ix 0 0 0 0;0 0 0 1 0 0;0 0 -3.24/Ix -3.6/Iy 0 0; 0 0 0 0 0 1;0 0 0 0 -3.24/Iz -3.60];
 A
 %A = [-.02*orientation1,[0;0;0],.02*orientation3] + A;
  for i =1:size
@@ -127,7 +125,6 @@ A
      shit1(i) = thrust(1);
      shit2(i) = thrust(2);
      shit3(i) = thrust(3);
-     shit4(i) = f(4);
      %{
      if thrust(1) >t
          thrust(1) = t;
@@ -197,8 +194,7 @@ stability = (err<0.005);
 hold on
 plot(shit2,'g');
 plot(shit3,'b');
-figure(3)
-plot(shit4,'k');
+%plot(shit4,'k');
  
  %{
 figure(2)
