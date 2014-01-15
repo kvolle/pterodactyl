@@ -12,7 +12,7 @@ for i = 1:6
         for k = 1:6;
             for x = 1:20
                 %[count4(i),err4(i)] = test(2.5,3,7.5);
-                [count(x),err(x)] = test(i*15+40,j*15+40,k*10);
+                [count(x),err(x)] = test(i*15+40,j*15+40,k*10,25);
                 %running = running+count4(i);
             end
             stableTable(i,j,k) = sum(count);

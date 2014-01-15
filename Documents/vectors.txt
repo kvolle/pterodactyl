@@ -1,0 +1,11 @@
+The closed form of the position vector is as follows
+\[ \left( \begin{array}{ccc}
+comY + P(cos(\psi)sin(\phi_{R})) \\
+H– comY +P(cos(\phi_{R})cos^{2}(\psi) + sin^{2}(\psi)) \\
+comZP(cos(\psi)sin(\psi) – cos(\phi_{R})cos(\psi)sin(\psi)) \end{array} \right) \]
+And the closed form of the orientation vector is as follows
+\[ \left( \begin{array}{ccc}
+sin(\psi) sin(\phi_{R}) \\
+sin(\psi) cos(\psi) cos(\phi_{R}) – sin(\psi) cos(\psi)\\
+-cos^{2}(\psi) - cos(\phi_{R})sin^{2}(\psii) \end{array} \right)
+ \]
