@@ -1,0 +1,39 @@
+\documentclass[a4paper,11pt, onecolumn]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\title{\vspace{-80px}Stability and Control Considerations in STOVL Aircraft Design\vspace{-50px}}
+\author{K. Volle and J. Rogers}
+\date{}%
+\usepackage[margin=1in]{geometry}
+
+\begin{document}
+\maketitle
+\renewcommand{\abstractname}{}
+\begin{abstract}
+\emph{\textbf{Historically, pilot comfort has limited utilization of VTOL/STOVL aircraft. The emergence of autonomous aircraft avoids this problem and has reopened this design category for new work. The Pterodactyl unmanned aerial vehicle is designed to transition between multiple flight modes so as to make it more suitable to a variety of mission profiles. }}
+\end{abstract}
+
+\section{Introduction}
+Fantasy football is a popular social game which has millions of participants each year. In fantasy football, a group of people form a "league" made of fictitious NFL teams. Points are scored for a team based on that week’s statistics for each player on their team. Fantasy Football introduces tens of thousands of people to statistics every year and a machine learning program that can evaluate players can do the same for computer science.
+
+\section{Related Work}
+Machine learning is almost a necessity in sports management. Nearly every aspect of all sports involve statistics and is very hard to make sense of all of it as a whole. [3] gives an overview of how machine learning can be (and is) used to predict sports performance. [3] concedes that statistical prediction has impacted the NFL far less than other sports. [2] shows how machine learning can be used to perform in the top 1\% of fantasy soccer, but fantasy soccer does not have agents coming to agreement for trades. Previously, [1] presented a dynamic programming strategy to solve the problem of team formulation in fantasy football. They were able to draft “better” (higher total rank) teams than some common draft strategies. Although the initial draft is important, the true evaluation of the team is done throughout the season, which can include changes to the team.
+
+\section{Implementation}
+The agent will operate in two phases. The first phase is the initial draft where all the agents participating the league will take turns selecting players for their team. The second phase is the period in between games where the agents can propose trades to other agents and must set their line-up. Only the players in the line-up receive points during the week’s games. Finally the league will simulate the week’s games and the agent will begin again at the second phase. When a trade is proposed, the other will either accept or decline the trade. If the trade is declined, the proposer will have the opportunity to revise the trade and propose again.
+
+We will use linear regression to learn the attributes which contribute to a player’s success. Machine learning is a must here since there are many different potential relevant attributes, such as past statistics for that player, but also the statistics of their teammates and those of the opponents, or even “home field advantage,” which we want to map to the fantasy score (hence, our choice of linear regression). Models will be determined for each player in addition to those found for general position (i.e. quarterback, tight end, et cetera). These can be compared to determine if the models can be generalized to each position, rather than individual players.
+
+\section{Evaluation}
+The algorithm will have its predictions tested against the 2011 season data and the 2012 year to date data. Additionally, leagues will be created in which the algorithm can play against the recommendations of sports pundits. Since we will be making use of a large amount of data, we believe our agent could identify relevant attributes that the experts miss, allowing it to outperform them. In addition, we can compare the team our agent creates against the NFL team efficiencies, the 2004 season reported in [3] to see if our agent is capable of creating overall better teams than even the professionals themselves.
+
+\section{References}
+[1] Fry, M.J., Lundberg, A.W., \& Ohhlman, J.W. (2007). A Player Selection Heuristic for a Sports League Draft. Journal of Quantitative Analysis in Sports, 3(2), 1-35.
+
+\noindent[2] Matthews, T., Ramchurn, S.D., \& Chalkiadakis, G. (2002, July). Competing With Humans at Fantasy Football: Team Formation in Large Partially-Observable Domains. In Twenty-Sixth AAAI Conference on Artificial Intelligence
+
+\noindent[3] Solieman, O. K. (2006). Data mining in sports: A research overview. Retrieved from http://ai.arizona.edu/mis480/syllabus/6\_
+Osama-DM\_in\_Sports.pdf
+
+\end{document}
