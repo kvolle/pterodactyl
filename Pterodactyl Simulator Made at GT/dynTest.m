@@ -1,7 +1,7 @@
 clear all
 clc
 
-m = 1;
+m = 15;
 Force = [0;0;0];
 Moment = [0;0;0];
 State = [0;0;-8;-pi/2;0;0;0;0;0;0;0;0];
@@ -24,7 +24,7 @@ for i = 1:n
     tmp = R*ball.State(7:9)
     error = error + (ball.State(3)+10)/1000
     acc = -15*(ball.State(3)+10) -20*tmp(3) -10*error;
-    ball.Force = R\[0;0;acc];
+    ball.Force = R\(m*[0;0;acc]);
     
     test2(i) = ball.State(3);
     test1(i) = tmp(3);

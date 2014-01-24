@@ -1,5 +1,6 @@
 clear all
 clc
+
 tic
 n = 65;
 nk = 5;
@@ -70,51 +71,25 @@ for ii = 1:n
  position4 = tmp(1:3,4);
  
 A = [cross(position1,orientation1),cross(position2,orientation2),cross(position3,orientation3),cross(position4,orientation4)]+ 0.29*[orientation1,-orientation2,-orientation3,orientation4];
-A(4,1) = orientation1(3);
-A(4,2) = orientation2(3);
-A(4,3) = orientation3(3);
-A(4,4) = orientation4(3);
+A(4:6,1) = orientation1;
+A(4:6,2) = orientation2;
+A(4:6,3) = orientation3;
+A(4:6,4) = orientation4;
 
-            %if cond(A) <10000
-                scale(ii,j,k) = det(A);
-                accelZ(ii,j,k) = abs(A(3,1))+abs(A(3,2))+abs(A(3,3))+abs(A(3,4));
-                %test(ii,j,k) = norm(A(:,2));
-                %accelY(ii,j,k) = norm(A(:,2));
-                if abs(scale(ii,j,k))<0.01
-                    scale(ii,j,k) = NaN;
-                    accelZ(ii,j,k) = NaN;
-                    %test(ii,j,k) = NaN;
-                end
-                %{
-                A = abs(A);
-                accelX(i,j,k) = sum(A(1,:))/Ix;
-                accelY(i,j,k) = sum(A(2,:))/Iy;
-                accelZ(i,j,k) = sum(A(3,:))/Iz;
-                scale(i,j,k) = norm([accelX(i,j,k) accelY(i,j,k) accelZ(i,j,k)]);
-                X(i) = phiL;
-                Y(j) = phiR;
-                %}
-            %else
-               % accelX(i,j,k) = NaN;
-               % accelY(i,j,k) = NaN;
-               % accelZ(i,j,k) = NaN;
-               % scale(i,j,k) = NaN;
-            %end            
+if (cond(A)<1000)
+    scale(ii,j,k) = 1/cond(A);
+else
+    scale(ii,j,k) = NaN;
+end
+               
         end
     end
 end
 
-surf(X,Y,accelZ(:,:,5))
-xlabel('phiL');
-ylabel('phiR');
-figure(2)
+
 surf(X,Y,scale(:,:,5))
 xlabel('phiL');
 ylabel('phiR');
-%figure(3)
-%surf(X,Y,test(:,:,5))
-%xlabel('phiL');
-%ylabel('phiR');
 
 %{
 [maximum(a,b),ind] = max(scale(:));

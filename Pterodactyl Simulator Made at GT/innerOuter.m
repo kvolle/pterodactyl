@@ -1,4 +1,3 @@
-function [success, err] = take2euler()
 
 % Define the geometric angles in radians
 phiL = 88*pi/180;
@@ -17,9 +16,9 @@ c=random('unif',0,200)/100 - 1;
 d=random('unif',0,200)/100 - 1;
 
 
-a = 0;
-b = 0;
-c = 0;
+a = 0.0013617439371;
+b = 0.0808835077630;
+c = 0.0336502034164;
 setPoint = -50;
 
 State = [0;0;setPoint;a;b;c/2;0;0;0;0;0;0];
@@ -40,30 +39,7 @@ Iy = 22.43;
 Iz = 30.68;
 Ib = [Ix 0 0;0 Iy 0;0 0 Iz];
 
-%~~~~~~~~~~~~~~~~~~~~~~~~~Original Design~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
-%{
- tmp =[0 0 1 -comZ;0 1 0 -comY;-1 0 0 comX;0 0 0 1]*...
-      [1 0 0 0;0 1 0 -hingeY;0 0 1 0;0 0 0 1]*...
-      [cos(psi) -sin(psi) 0 0;sin(psi) cos(psi) 0 0;0 0 1 0;0 0 0 1]*...
-      [1 0 0 0;0 cos(-phiL) -sin(-phiL) 0;0 sin(-phiL) cos(-phiL) 0;0 0 0 1]*...
-      [cos(-psi) -sin(-psi) 0 0;sin(-psi) cos(-psi) 0 0;0 0 1 0;0 0 0 1]*...
-      [1 0 0 0;0 1 0 -hinge2Prop;0 0 1 0;0 0 0 1];
- orientation1 = tmp(1:3,1);
- position1 = tmp(1:3,4);
- orientation2 = [0;0;-1];
- position2 = [-comZ;-comY;comX];
- tmp =[0 0 1 -comZ;0 1 0 -comY;-1 0 0 comX;0 0 0 1]*...
-      [1 0 0 0;0 1 0 hingeY;0 0 1 0;0 0 0 1]*...
-      [cos(-psi) -sin(-psi) 0 0;sin(-psi) cos(-psi) 0 0;0 0 1 0;0 0 0 1]*...
-      [1 0 0 0;0 cos(phiR) -sin(phiR) 0;0 sin(phiR) cos(phiR) 0;0 0 0 1]*...
-      [cos(psi) -sin(psi) 0 0;sin(psi) cos(psi) 0 0;0 0 1 0;0 0 0 1]*...
-      [1 0 0 0;0 1 0 hinge2Prop;0 0 1 0;0 0 0 1];
- orientation3 = tmp(1:3,1);
- position3 = tmp(1:3,4);
 
- A = [cross(position1,orientation1),cross(position2,orientation2),cross(position3,orientation3)] - 0.29*[orientation1,-orientation2,-orientation3];
-%}
-%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %~~~~~~~~~~~~~~~~~~~~~~~~~Counter Rotating~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 %{
  tmp =[0 0 1 -comZ;0 1 0 -comY;-1 0 0 comX;0 0 0 1]*...
@@ -122,13 +98,16 @@ Ib = [Ix 0 0;0 Iy 0;0 0 Iz];
  orientation4 = tmp(1:3,1);
  position4 = tmp(1:3,4);
  
-A = [cross(position1,orientation1),cross(position2,orientation2),cross(position3,orientation3),cross(position4,orientation4)]+ 0.29*[orientation1,-orientation2,orientation3,-orientation4];
+A = [cross(position1,orientation1),cross(position2,orientation2),cross(position3,orientation3),cross(position4,orientation4)]+ 0.29*[orientation1,-orientation2,-orientation3,orientation4];
 A(4,1) = orientation1(3);
 A(4,2) = orientation2(3);
 A(4,3) = orientation3(3);
 A(4,4) = orientation4(3);
 disp('Determinant');
 det(A)
+
+AA = [cross(position1,orientation1),cross(position2,orientation2),cross(position3,orientation3),cross(position4,orientation4)]+ 0.29*[orientation1,-orientation2,-orientation3,orientation4];
+AA(4:6,:) = [orientation1 orientation2 orientation3 orientation4];
 %}
 %~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%
 
@@ -167,45 +146,112 @@ a = [0 1 0 0 0 0;-14 -10 0 0 0 0;0 0 0 1 0 0;0 0 -14 -10 0 0;0 0 0 0 0 1;0 0 0 0
     testRa(1) = 0;
     testPa(1) = 0;
     testYa(1) = 0;
-   time(1) = 0.001;
-    error = 0;
+   
     shit(1) = copter.State(3);
-for i=2:n 
-    time(i) = i/1000;
-    testR(i) = copter.State(4);
-    testP(i) = copter.State(5);
-    testY(i) = copter.State(6);
-    testRv(i) = copter.State(10);
-    testPv(i) = copter.State(11);
-    testYv(i) = copter.State(12);
-    testRa(i) = 1000*(testRv(i)-testRv(i-1));
-    testPa(i) = 1000*(testPv(i)-testPv(i-1));
-    testYa(i) = 1000*(testYv(i)-testYv(i-1));
-    x = [copter.State(4);copter.State(10);copter.State(5);copter.State(11);copter.State(6);copter.State(12)];
-    f = a*x;
     
-    % Calculate the moment to command in world coordinates
-    worldMom = Ib*[f(2);f(4);f(6)];
+    time = 0.001:0.001:10;
+    errorX = 0;
+    errorY = 0;
+    errorZ = 0;
+    
+    
+for i=2:n 
+    
     Or = copter.State(4:6);
+    %{
+    if (isnan(Or(1))||isnan(Or(2))||isnan(Or(3)))
+        disp('Broken');
+        i
+        break
+    end
+    %}
+    
     % Pre multiplying a vector in body coord by R transforms to world coord
     R = [cos(Or(2))*cos(Or(3)) -cos(Or(2))*sin(Or(3)) sin(Or(2));...
          cos(Or(1))*sin(Or(3))+cos(Or(3))*sin(Or(1))*sin(Or(2)) cos(Or(1))*cos(Or(3))-sin(Or(1))*sin(Or(2))*sin(Or(3)) -cos(Or(2))*sin(Or(1));...
          sin(Or(1))*sin(Or(3))-cos(Or(1))*cos(Or(3))*sin(Or(2)) cos(Or(3))*sin(Or(1))+cos(Or(1))*sin(Or(2))*sin(Or(3)) cos(Or(1))*cos(Or(2))];
      
-     bodyMom = R\worldMom;
-     
+   
+    testR(i) = copter.State(4);
+    testP(i) = copter.State(5);
+    testY(i) = copter.State(6);
+    
      % Now to calculate the total force required to maintain altitude
      tmp = R*copter.State(7:9);
-     error = error + (copter.State(3)-setPoint)/1000;
-     accel = -15*(copter.State(3)-setPoint) - 20*tmp(3) - 10*error;
      
-     bodyForce = transpose(R)*m*[0;0;accel-15];
+     errorX = errorX + (copter.State(1)-0)/1000;
+     errorY = errorY + (copter.State(2)-0)/1000;
+     errorZ = errorZ + (copter.State(3)-setPoint)/1000;
+     
+     accelX = -15*(copter.State(1)-0) - 20*tmp(1) -10*errorX;
+     accelY = -15*(copter.State(2)-0) - 20*tmp(2) -10*errorY;
+     accelZ = -15*(copter.State(3)-setPoint) - 20*tmp(3) - 10*errorZ;
+     
+     %bodyForce = transpose(R)*m*[accelX;accelY;accelZ];
+     worldForce = m*[accelX;accelY;accelZ];
+     
+     forceMag = norm(worldForce);
+     forceDirection = [0;0;-1];
+     if (forceMag > 0)
+         forceDirection = worldForce/forceMag;
+     end 
+%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-     thrust = A\[bodyMom;bodyForce(3)];
-     if (i == 200)
-         thrust
-         A*thrust
-     end
+    %Find the setpoints to align force with configuration force
+    naturalForce = AA(4:6,:)*null(AA(1:3,:));
+    naturalForce = naturalForce/norm(naturalForce);
+    forceDirection;
+    d = dot(naturalForce,forceDirection);
+    theta = acos(d);
+
+    w = cos(theta/2);
+
+    c = cross(naturalForce,forceDirection);
+    c = sin(theta/2)*c/norm(c);
+    x = c(1);
+    y = c(2);
+    z = c(3);
+
+    w2 = w^2;
+    x2 = x^2;
+    y2 = y^2;
+    z2 = z^2;
+
+    Rd = [w2+x2-y2-z2 2*(x*y-w*z) 2*(w*y+x*z);2*(x*y+w*z) w2-x2+y2-z2 2*(y*z-w*x);2*(x*z-w*y) 2*(w*x+y*z) w2-x2-y2+z2];
+    
+    setYaw = atan2(Rd(3,2),Rd(3,3));
+    setPitch = atan2(-Rd(3,1),Rd(3,3)/cos(setYaw));
+    setRoll = atan2(Rd(2,1),Rd(1,1));
+    %{
+    figure(4)
+    hold on
+    plot(i/1000,setRoll,'r.');
+    plot(i/1000,setPitch,'g.');
+    plot(i/1000,setYaw,'b.');
+    %}
+    if i == 2
+        setRoll
+        setPitch
+        setYaw
+    end
+    % Calculate 
+    x = [copter.State(4)-setRoll;copter.State(10);copter.State(5)-setPitch;copter.State(11);copter.State(6)-setYaw;copter.State(12)];
+    f = a*x;
+    
+    
+    % Calculate the moment to command in world coordinates
+    worldMom = Ib*[f(2);f(4);f(6)];
+    %%%Or = copter.State(4:6);
+
+    % Pre multiplying a vector in body coord by R transforms to world coord
+    %%%R = [cos(Or(2))*cos(Or(3)) -cos(Or(2))*sin(Or(3)) sin(Or(2));...
+    %%%     cos(Or(1))*sin(Or(3))+cos(Or(3))*sin(Or(1))*sin(Or(2)) cos(Or(1))*cos(Or(3))-sin(Or(1))*sin(Or(2))*sin(Or(3)) -cos(Or(2))*sin(Or(1));...
+    %%%     sin(Or(1))*sin(Or(3))-cos(Or(1))*cos(Or(3))*sin(Or(2)) cos(Or(3))*sin(Or(1))+cos(Or(1))*sin(Or(2))*sin(Or(3)) cos(Or(1))*cos(Or(2))];
+     
+     bodyMom = R\worldMom;
+      
+
+     thrust = A\[bodyMom;-forceMag];
      %thrust = A2\[bodyMom(1);bodyMom(2)];
      
      if max(abs(thrust))>15
@@ -214,69 +260,45 @@ for i=2:n
      temp1(i) = copter.State(1);%thrust(1);
      temp2(i) = copter.State(2);%thrust(2);
      temp3(i) = -copter.State(3);%thrust(3);
-     shit(i) = thrust(1);
-     shit2(i) = thrust(2);
-     shit3(i) = thrust(3);
+     
+     shit(i) = copter.Force(1);%thrust(1);
+     shit2(i) = copter.Force(2);%thrust(2);
+     shit3(i) = copter.Force(3);%thrust(3);
      shit4(i) = thrust(4);
-%     temp4(i) = thrust(4);
-     %axis = bodyMom/norm(bodyMom);
-     %inertia(i) = dot(axis,Ib*axis);
 
-     %tl = 100;
-     %thrust = tl*thrust/max(abs(thrust));
-    if mod(n,10)==0
+   %if mod(n,10)==0
         tmp = A*thrust;
+        
         copter.Moment = tmp(1:3);%[thrust(1);0;thrust(2)];
         copter.Force = [orientation1 orientation2 orientation3 orientation4]*thrust;
-        shit(i) = copter.Force(1);
-        shit2(i) = copter.Force(2);
-        shit3(i) = copter.Force(3);
-    end
+    %end
 
      copter.State = copter.homebrewRK4();
 end
 success = (norm(copter.State(4:6))<0.035);
 err = norm(copter.State(4:6));
 %
-A
 figure(1)
-h1 = plot(time,testR*180/pi,'r',time,testP*180/pi,'g',time,testY*180/pi,'b');
+plot(time,testR*180/pi,'r',time,testP*180/pi,'g',time,testY*180/pi,'b');
 legend('Roll Angle','Pitch Angle','Yaw Angle');
-hold on
-%h2 = plot(time,testP*180/pi,'g');
-
-%h3 = plot(time,testY*180/pi,'b');
-%legend(h1,'Roll Angle', h2, 'Pitch Angle', h3, 'Yaw Angle');
 xlabel('Time (Seconds)');
 ylabel('Angle (Degrees)');
-
 %}
 figure(2)
-%{
-plot(temp1,'r');
-hold on
-plot(temp2,'g');
-plot(temp3,'b');
-plot(temp4,'k');
-%}
 %
 plot3(temp1(2:3333),temp2(2:3333),temp3(2:3333),'r');
 hold on
 plot3(temp1(3334:6666),temp2(3334:6666),temp3(3334:6666),'g');
 plot3(temp1(6667:10000),temp2(6667:10000),temp3(6667:10000),'b');
-legend('First 3.3 Seconds','Second 3.3 Seconds','Final 3.3 Seconds','NorthEast');
-
+legend('First 3.3 Seconds','Second 3.3 Seconds','Final 3.3 Seconds');
+%}
 xlabel('X Displacement (ft)');
-ylabel('Y Displacement (ft)'); 
+ylabel('Y Displacement (ft)');
 zlabel('Altitude (ft)');
 %}
 figure(3)
-%{
 plot(shit,'r');
 hold on
 plot(shit2,'g');
 plot(shit3,'b');
-%}
-plot(time, temp3);
-copter.Force/norm(copter.Force)
 %plot(shit4,'k');
