@@ -1,4 +1,4 @@
-function [success, err] = take2euler()
+%function [success, err] = take2euler()
 
 % Define the geometric angles in radians
 phiL = 88*pi/180;
@@ -17,12 +17,12 @@ c=random('unif',0,200)/100 - 1;
 d=random('unif',0,200)/100 - 1;
 
 
-a = 0;
-b = 0;
-c = 0;
+setRoll = 0.002194;
+setPitch = 0.076024;
+setYaw = 0.000083;
 setPoint = -50;
 
-State = [0;0;setPoint;a;b;c/2;0;0;0;0;0;0];
+State = [0;0;setPoint;setRoll;setPitch;setYaw;0;0;0;0;0;0];
 % Next line is for use if quaternions are used instead of euler angles
 %State(4:7) = [cos(-pi/4);sin(-pi/4);0;0];
 
@@ -181,7 +181,7 @@ for i=2:n
     testRa(i) = 1000*(testRv(i)-testRv(i-1));
     testPa(i) = 1000*(testPv(i)-testPv(i-1));
     testYa(i) = 1000*(testYv(i)-testYv(i-1));
-    x = [copter.State(4);copter.State(10);copter.State(5);copter.State(11);copter.State(6);copter.State(12)];
+    x = [copter.State(4)-setRoll;copter.State(10);copter.State(5)-setPitch;copter.State(11);copter.State(6)-setYaw;copter.State(12)];
     f = a*x;
     
     % Calculate the moment to command in world coordinates
@@ -191,7 +191,7 @@ for i=2:n
     R = [cos(Or(2))*cos(Or(3)) -cos(Or(2))*sin(Or(3)) sin(Or(2));...
          cos(Or(1))*sin(Or(3))+cos(Or(3))*sin(Or(1))*sin(Or(2)) cos(Or(1))*cos(Or(3))-sin(Or(1))*sin(Or(2))*sin(Or(3)) -cos(Or(2))*sin(Or(1));...
          sin(Or(1))*sin(Or(3))-cos(Or(1))*cos(Or(3))*sin(Or(2)) cos(Or(3))*sin(Or(1))+cos(Or(1))*sin(Or(2))*sin(Or(3)) cos(Or(1))*cos(Or(2))];
-     
+
      bodyMom = R\worldMom;
      
      % Now to calculate the total force required to maintain altitude
@@ -224,7 +224,7 @@ for i=2:n
 
      %tl = 100;
      %thrust = tl*thrust/max(abs(thrust));
-    if mod(n,10)==0
+    if mod(i,10)==0
         tmp = A*thrust;
         copter.Moment = tmp(1:3);%[thrust(1);0;thrust(2)];
         copter.Force = [orientation1 orientation2 orientation3 orientation4]*thrust;
@@ -271,12 +271,13 @@ ylabel('Y Displacement (ft)');
 zlabel('Altitude (ft)');
 %}
 figure(3)
-%{
-plot(shit,'r');
-hold on
-plot(shit2,'g');
-plot(shit3,'b');
-%}
-plot(time, temp3);
+V1 = R*[1;0;0];
+    V2 = R*[0;-1;0];
+    V3 = R*[0;0;-1];
+    plot3(linspace(0,V1(1),3),linspace(0,V1(2),3),linspace(0,V1(3),3),'r');
+    axis([-1 1 -1 1 -1 1])
+    hold on
+    plot3(linspace(0,V2(1),3),linspace(0,V2(2),3),linspace(0,V2(3),3),'g');
+    plot3(linspace(0,V3(1),3),linspace(0,V3(2),3),linspace(0,V3(3),3),'b');
 copter.Force/norm(copter.Force)
 %plot(shit4,'k');
