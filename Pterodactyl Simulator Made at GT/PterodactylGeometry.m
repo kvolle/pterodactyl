@@ -12,7 +12,7 @@ comZ = 0;
 % Hinge Geometry
 hingeY = 1.75;  % Distance from center to hinge/LE intersection
 psi = 15*pi/180;
-phi    = 90*pi/180;     % Angle of the hinge, tips down for positive angle
+phi    = 00*pi/180;     % Angle of the hinge, tips down for positive angle
 
 %Propeller Position
 hingeToProp = 0.5;
