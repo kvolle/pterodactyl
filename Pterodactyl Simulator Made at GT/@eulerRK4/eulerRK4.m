@@ -24,6 +24,7 @@ classdef eulerRK4
                        cos(Or(1))*sin(Or(3))+cos(Or(3))*sin(Or(1))*sin(Or(2)) cos(Or(1))*cos(Or(3))-sin(Or(1))*sin(Or(2))*sin(Or(3)) -cos(Or(2))*sin(Or(1));...
                        sin(Or(1))*sin(Or(3))-cos(Or(1))*cos(Or(3))*sin(Or(2)) cos(Or(3))*sin(Or(1))+cos(Or(1))*sin(Or(2))*sin(Or(3)) cos(Or(1))*cos(Or(2))])*[0;0;obj.m*32.2];
             % Define the three matrices used in calculating the diff eqs
+            %%% Confirm -y error
             TransKinDiffEq = [cos(Or(2))*cos(Or(3)), sin(Or(1))*sin(Or(2))*cos(Or(3))-cos(Or(1))*sin(Or(3)), cos(Or(1))*sin(Or(2))*cos(Or(3))-sin(Or(1))*sin(Or(3));
                               cos(Or(2))*sin(Or(3)), sin(Or(1))*sin(Or(2))*sin(Or(3))-cos(Or(1))*cos(Or(3)), cos(Or(1))*sin(Or(2))*sin(Or(3))-sin(Or(1))*cos(Or(3));
                             -sin(Or(2)), sin(Or(1))*cos(Or(2)), cos(Or(1))*cos(Or(2))];
